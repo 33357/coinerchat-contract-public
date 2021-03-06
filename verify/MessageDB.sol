@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.4;
 
-import "./interfaces/IMessageDB.sol";
-import "../../libraries/@openzeppelin/contracts/math/SafeMath.sol";
-import "../../libraries/AcceptedCaller.sol";
+import "./IMessageDB.sol";
+import "./SafeMath.sol";
+import "./AcceptedCaller.sol";
 
 contract MessageDB is IMessageDB, AcceptedCaller {
     using SafeMath for uint256;
