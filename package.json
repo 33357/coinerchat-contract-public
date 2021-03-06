@@ -20,6 +20,10 @@
   },
   "homepage": "https://github.com/33357/hecochat-contract-public#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.4.1"
+    "@openzeppelin/contracts": "^3.4.1",
+    "truffle-hdwallet-provider": "^1.0.17"
+  },
+  "devDependencies": {
+    "truffle-plugin-verify": "^0.5.6"
   }
 }
