@@ -19,8 +19,8 @@ contract FucksToken is IToken, Ownable {
     uint256 public decimals;
     uint256 public _totalSupply;
 
-    mapping(address => uint) balances;
-    mapping(address => mapping(address => uint)) allowed;
+    mapping(address => uint256) balances;
+    mapping(address => mapping(address => uint256)) allowed;
 
 
     // ------------------------------------------------------------------------
@@ -57,7 +57,7 @@ contract FucksToken is IToken, Ownable {
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-    function transfer(address to, uint tokens) public override returns (bool) {
+    function transfer(address to, uint256 tokens) public override returns (bool) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -73,7 +73,7 @@ contract FucksToken is IToken, Ownable {
     // recommends that there are no checks for the approval double-spend attack
     // as this should be implemented in user interfaces 
     // ------------------------------------------------------------------------
-    function approve(address spender, uint tokens) public override returns (bool) {
+    function approve(address spender, uint256 tokens) public override returns (bool) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -89,7 +89,7 @@ contract FucksToken is IToken, Ownable {
     // - Spender must have sufficient allowance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-    function transferFrom(address from, address to, uint tokens) public override returns (bool) {
+    function transferFrom(address from, address to, uint256 tokens) public override returns (bool) {
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
