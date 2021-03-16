@@ -28,7 +28,7 @@ contract FucksToken is IToken, Ownable {
         symbol = "HCT";
         name = "HecoChat Token";
         decimals = 18;
-        _totalSupply = 1 * 10**10 * 10**18;
+        _totalSupply = 100 * 10**8 * 10**18;
         balances[msg.sender] = _totalSupply;
         lockTime = block.timestamp + 4 * 365 * 24 * 60 * 60;
         emit Transfer(address(0), msg.sender, _totalSupply);
@@ -41,8 +41,10 @@ contract FucksToken is IToken, Ownable {
         returns (bool)
     {
         require(block.timestamp >= lockTime);
+        require(tokens <= _totalSupply.mul(5).div(100));
         _totalSupply = _totalSupply.add(tokens);
         balances[to] = balances[to].add(tokens);
+        lockTime = lockTime + 1 * 365 * 24 * 60 * 60;
         emit Transfer(address(0), to, tokens);
         return true;
     }

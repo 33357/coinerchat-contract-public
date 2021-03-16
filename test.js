@@ -1,8 +1,8 @@
 function a(all){
     let _all=0;
-    for(let i=0;i<12*4;i++){
+    for(let i=0;i<1000;i++){
         _all+=all
-        all=all*0.95
+        all=all*((100-10)/100)
     }
     return _all;
 }
