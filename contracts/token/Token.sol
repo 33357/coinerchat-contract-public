@@ -9,7 +9,7 @@ import "./interfaces/IToken.sol";
 // ERC20 Token, with the addition of symbol, name and decimals and assisted
 // token transfers
 // ----------------------------------------------------------------------------
-contract FucksToken is IToken, Ownable {
+contract Token is IToken, Ownable {
     using SafeMath for uint256;
 
     string public symbol;

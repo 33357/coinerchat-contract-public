@@ -2,7 +2,6 @@
 pragma solidity >=0.7.4;
 
 interface IToken {
-   
     function totalSupply() external view returns(uint256);
     function balanceOf(address tokenOwner) external view returns (uint256);
     function allowance(address tokenOwner, address spender) external view returns (uint256);
