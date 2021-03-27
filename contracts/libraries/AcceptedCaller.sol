@@ -43,15 +43,15 @@ contract AcceptedCaller is IAcceptedCaller, Ownable {
     function acceptedCaller() public view override returns (address[] memory) {
         uint256 len = 0;
         address[] memory arr = new address[](_callerAddrs.length);
-        for (uint256 i = 0 ; i < _callerAddrs.length; i++) {
+        for (uint256 i = 0; i < _callerAddrs.length; i++) {
             if (callers[_callerAddrs[i]].accepted == true) {
-                arr[len]=_callerAddrs[i];
+                arr[len] = _callerAddrs[i];
                 len++;
             }
         }
         address[] memory _arr = new address[](len);
-        for (uint256 i = 0 ; i < len; i++) {
-            _arr[i]=arr[i];
+        for (uint256 i = 0; i < len; i++) {
+            _arr[i] = arr[i];
         }
         return _arr;
     }

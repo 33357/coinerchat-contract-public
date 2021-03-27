@@ -12,6 +12,11 @@ import "./interfaces/IToken.sol";
 contract Token is IToken, Ownable {
     using SafeMath for uint256;
 
+    struct Pool {
+        bool have;
+        bool seted;
+    }
+
     string public symbol;
     string public name;
     uint256 public decimals;
@@ -20,6 +25,9 @@ contract Token is IToken, Ownable {
 
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
+    mapping(address => Pool) pools;
+
+    address[] private poolAddrs;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -34,38 +42,97 @@ contract Token is IToken, Ownable {
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
-    function addToken(address to, uint256 tokens)
+    function addToken(address _to, uint256 _tokens)
         public
         override
         onlyOwner
         returns (bool)
     {
-        require(block.timestamp >= lockTime);
-        require(tokens <= _totalSupply.mul(5).div(100));
-        _totalSupply = _totalSupply.add(tokens);
-        balances[to] = balances[to].add(tokens);
-        lockTime = lockTime + 1 * 365 * 24 * 60 * 60;
-        emit Transfer(address(0), to, tokens);
+        require(block.timestamp >= lockTime, "addToken: at lockTime!");
+        require(
+            _tokens <= _totalSupply.mul(5).div(100),
+            "addToken: over 5% of the totalSupply!"
+        );
+        _totalSupply = _totalSupply.add(_tokens);
+        balances[_to] = balances[_to].add(_tokens);
+        lockTime = block.timestamp + 1 * 365 * 24 * 60 * 60;
+        emit AddToken(address(0), _to, _tokens);
         return true;
     }
 
-    // ------------------------------------------------------------------------
-    // Total supply
-    // ------------------------------------------------------------------------
+    function getPoolAddrs() public view override returns (address[] memory) {
+        uint256 len = poolAddrs.length;
+        uint256 _len = 0;
+        address[] memory arr = new address[](len);
+        for (uint256 i = 0; i < len; i++) {
+            if (pools[poolAddrs[i]].have == true) {
+                arr[_len] = poolAddrs[i];
+                _len = _len + 1;
+            }
+        }
+        address[] memory _arr = new address[](_len);
+        if (_len == 0) {
+            return _arr;
+        } else {
+            for (uint256 i = 0; i < _len; i++) {
+                _arr[i] = arr[i];
+            }
+            return _arr;
+        }
+    }
+
+    function addPool(address _pool) public override onlyOwner returns (bool) {
+        require(pools[_pool].have == false, "removePool: is setedPool!");
+        if (pools[_pool].seted == false) {
+            pools[_pool].seted = true;
+            poolAddrs.push(_pool);
+        }
+        pools[_pool].have = true;
+        return true;
+    }
+
+    function removePool(address _pool)
+        public
+        override
+        onlyOwner
+        returns (bool)
+    {
+        require(pools[_pool].have == true, "removePool: not setedPool!");
+        pools[_pool].have = false;
+        return true;
+    }
+
     function totalSupply() public view override returns (uint256) {
         return _totalSupply - balances[address(0)];
+    }
+
+    function totalCirculation() public view override returns (uint256) {
+        uint256 len = poolAddrs.length;
+        uint256 __totalCirculation = totalSupply();
+        if (len == 0) {
+            return __totalCirculation;
+        } else {
+            for (uint256 i = 0; i < len; i++) {
+                if (pools[poolAddrs[i]].have == true) {
+                    __totalCirculation =
+                        __totalCirculation -
+                        balances[poolAddrs[i]];
+                }
+            }
+            return __totalCirculation;
+        }
     }
 
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
-    function balanceOf(address tokenOwner)
+    function balanceOf(address _tokenOwner)
         public
         view
         override
         returns (uint256)
     {
-        return balances[tokenOwner];
+        return balances[_tokenOwner];
     }
 
     // ------------------------------------------------------------------------
@@ -73,14 +140,14 @@ contract Token is IToken, Ownable {
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-    function transfer(address to, uint256 tokens)
+    function transfer(address _to, uint256 _tokens)
         public
         override
         returns (bool)
     {
-        balances[msg.sender] = balances[msg.sender].sub(tokens);
-        balances[to] = balances[to].add(tokens);
-        emit Transfer(msg.sender, to, tokens);
+        balances[msg.sender] = balances[msg.sender].sub(_tokens);
+        balances[_to] = balances[_to].add(_tokens);
+        emit Transfer(msg.sender, _to, _tokens);
         return true;
     }
 
@@ -92,13 +159,13 @@ contract Token is IToken, Ownable {
     // recommends that there are no checks for the approval double-spend attack
     // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
-    function approve(address spender, uint256 tokens)
+    function approve(address _spender, uint256 _tokens)
         public
         override
         returns (bool)
     {
-        allowed[msg.sender][spender] = tokens;
-        emit Approval(msg.sender, spender, tokens);
+        allowed[msg.sender][_spender] = _tokens;
+        emit Approval(msg.sender, _spender, _tokens);
         return true;
     }
 
@@ -112,14 +179,14 @@ contract Token is IToken, Ownable {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(
-        address from,
-        address to,
-        uint256 tokens
+        address _from,
+        address _to,
+        uint256 _tokens
     ) public override returns (bool) {
-        balances[from] = balances[from].sub(tokens);
-        allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
-        balances[to] = balances[to].add(tokens);
-        emit Transfer(from, to, tokens);
+        balances[_from] = balances[_from].sub(_tokens);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_tokens);
+        balances[_to] = balances[_to].add(_tokens);
+        emit Transfer(_from, _to, _tokens);
         return true;
     }
 
@@ -127,12 +194,12 @@ contract Token is IToken, Ownable {
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
     // ------------------------------------------------------------------------
-    function allowance(address tokenOwner, address spender)
+    function allowance(address _tokenOwner, address _spender)
         public
         view
         override
         returns (uint256)
     {
-        return allowed[tokenOwner][spender];
+        return allowed[_tokenOwner][_spender];
     }
 }
