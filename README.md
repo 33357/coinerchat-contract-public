@@ -1,4 +1,4 @@
-# hecochat-contract-public
+# coinerchat-contract-public
 
 合约部署地址：
 - MessageRouter: [https://hecoinfo.com/address/0x052bb54150313c685aac197cd971a862c09edeef](https://hecoinfo.com/address/0x052bb54150313c685aac197cd971a862c09edeef)
