@@ -1,5 +1,5 @@
 {
-  "name": "hecochat-contract-public",
+  "name": "coinerchat-contract-public",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/33357/hecochat-contract-public.git"
+    "url": "git+https://github.com/33357/coinerchat-contract-public.git"
   },
   "author": "33357",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/33357/hecochat-contract-public/issues"
+    "url": "https://github.com/33357/coinerchat-contract-public/issues"
   },
-  "homepage": "https://github.com/33357/hecochat-contract-public#readme",
+  "homepage": "https://github.com/33357/coinerchat-contract-public#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.1",
     "truffle-hdwallet-provider": "^1.0.17"
