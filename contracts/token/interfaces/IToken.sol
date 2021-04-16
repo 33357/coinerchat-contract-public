@@ -9,19 +9,20 @@ interface IToken {
         address indexed _spender,
         uint256 _tokens
     );
-    event AddToken(address indexed _from, address indexed _to, uint256 _tokens);
+    event AddLockPool(address indexed _pool);
+    event RemoveLockPool(address indexed _pool);
 
     function totalCirculation() external view returns (uint256);
 
-    function getPoolAddrs() external view returns (address[] memory);
+    function getLockPoolAddrs() external view returns (address[] memory);
 
     function totalSupply() external view returns (uint256);
 
     function balanceOf(address _tokenOwner) external view returns (uint256);
 
-    function addPool(address _pool) external returns (bool);
+    function addLockPool(address _pool) external returns (bool);
 
-    function removePool(address _pool) external returns (bool);
+    function removeLockPool(address _pool) external returns (bool);
 
     function allowance(address _tokenOwner, address _spender)
         external
@@ -38,7 +39,7 @@ interface IToken {
         uint256 _tokens
     ) external returns (bool);
 
-    function addToken(address _to, uint256 _tokens) external returns (bool);
+    function mint(address _to, uint256 _tokens) external returns (bool);
 
 
 }

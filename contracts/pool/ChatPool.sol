@@ -140,7 +140,9 @@ contract ChatPool is IChatPool, AcceptedCaller {
     ) public override onlyOwner returns (bool) {
         require(pools[_token].seted == false, "addPool: token is seted!");
         _poolAddrs.push(_token);
-        pools[_token].token = IERC20(_token);
+        if(_token!=address(0)){
+            pools[_token].token = IERC20(_token);
+        }
         pools[_token].point = _point;
         pools[_token].minBalance = _minBalance;
         pools[_token].seted = true;
@@ -209,6 +211,7 @@ contract ChatPool is IChatPool, AcceptedCaller {
     {
         require(pools[_token].paused == true, "setPoolPoint: not paused pool!");
         totalPoint = totalPoint.add(pools[_token].point);
+        pools[_token].lastRewardBlock=block.number;
         pools[_token].paused = false;
         return true;
     }
@@ -267,7 +270,7 @@ contract ChatPool is IChatPool, AcceptedCaller {
             pools[_token].lastRewardBlock = block.number;
             emit Min(_sender, _token, reward);
             return true;
-        } else {
+        }else{
             return false;
         }
     }

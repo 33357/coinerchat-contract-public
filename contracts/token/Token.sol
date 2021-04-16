@@ -12,7 +12,7 @@ import "./interfaces/IToken.sol";
 contract Token is IToken, Ownable {
     using SafeMath for uint256;
 
-    struct Pool {
+    struct LockPool {
         bool have;
         bool seted;
     }
@@ -25,16 +25,16 @@ contract Token is IToken, Ownable {
 
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    mapping(address => Pool) pools;
+    mapping(address => LockPool) lockPools;
 
-    address[] private poolAddrs;
+    address[] private lockPoolAddrs;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
     constructor() {
-        symbol = "HCT";
-        name = "HecoChat Token";
+        symbol = "HCHAT";
+        name = "HecoCoinerChatToken";
         decimals = 18;
         _totalSupply = 100 * 10**8 * 10**18;
         balances[msg.sender] = _totalSupply;
@@ -42,31 +42,31 @@ contract Token is IToken, Ownable {
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
-    function addToken(address _to, uint256 _tokens)
+    function mint(address _to, uint256 _tokens)
         public
         override
         onlyOwner
         returns (bool)
     {
-        require(block.timestamp >= lockTime, "addToken: at lockTime!");
+        require(block.timestamp >= lockTime, "mint: at lockTime!");
         require(
             _tokens <= _totalSupply.mul(5).div(100),
-            "addToken: over 5% of the totalSupply!"
+            "mint: over 5% of the totalSupply!"
         );
         _totalSupply = _totalSupply.add(_tokens);
         balances[_to] = balances[_to].add(_tokens);
         lockTime = block.timestamp + 1 * 365 * 24 * 60 * 60;
-        emit AddToken(address(0), _to, _tokens);
+        emit Transfer(address(0), _to, _tokens);
         return true;
     }
 
-    function getPoolAddrs() public view override returns (address[] memory) {
-        uint256 len = poolAddrs.length;
+    function getLockPoolAddrs() public view override returns (address[] memory) {
+        uint256 len = lockPoolAddrs.length;
         uint256 _len = 0;
         address[] memory arr = new address[](len);
         for (uint256 i = 0; i < len; i++) {
-            if (pools[poolAddrs[i]].have == true) {
-                arr[_len] = poolAddrs[i];
+            if (lockPools[lockPoolAddrs[i]].have == true) {
+                arr[_len] = lockPoolAddrs[i];
                 _len = _len + 1;
             }
         }
@@ -81,24 +81,26 @@ contract Token is IToken, Ownable {
         }
     }
 
-    function addPool(address _pool) public override onlyOwner returns (bool) {
-        require(pools[_pool].have == false, "removePool: is setedPool!");
-        if (pools[_pool].seted == false) {
-            pools[_pool].seted = true;
-            poolAddrs.push(_pool);
+    function addLockPool(address _pool) public override onlyOwner returns (bool) {
+        require(lockPools[_pool].have == false, "removeLockPool: is setedPool!");
+        if (lockPools[_pool].seted == false) {
+            lockPools[_pool].seted = true;
+            lockPoolAddrs.push(_pool);
         }
-        pools[_pool].have = true;
+        lockPools[_pool].have = true;
+        emit AddLockPool(_pool);
         return true;
     }
 
-    function removePool(address _pool)
+    function removeLockPool(address _pool)
         public
         override
         onlyOwner
         returns (bool)
     {
-        require(pools[_pool].have == true, "removePool: not setedPool!");
-        pools[_pool].have = false;
+        require(lockPools[_pool].have == true, "removeLockPool: not setedPool!");
+        lockPools[_pool].have = false;
+        emit RemoveLockPool(_pool);
         return true;
     }
 
@@ -107,16 +109,16 @@ contract Token is IToken, Ownable {
     }
 
     function totalCirculation() public view override returns (uint256) {
-        uint256 len = poolAddrs.length;
+        uint256 len = lockPoolAddrs.length;
         uint256 __totalCirculation = totalSupply();
         if (len == 0) {
             return __totalCirculation;
         } else {
             for (uint256 i = 0; i < len; i++) {
-                if (pools[poolAddrs[i]].have == true) {
+                if (lockPools[lockPoolAddrs[i]].have == true) {
                     __totalCirculation =
                         __totalCirculation -
-                        balances[poolAddrs[i]];
+                        balances[lockPoolAddrs[i]];
                 }
             }
             return __totalCirculation;
