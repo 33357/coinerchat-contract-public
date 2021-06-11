@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.4;
 
-interface IChatPool {
-    event WithdrawReward(address sender, uint256 reward);
-    event Min(address sender, address pool, uint256 reward);
+interface ILPPool {
+    event WithdrawReward(address miner, address token ,uint256 reward);
+    event WithdrawLP(address miner, address token ,uint256 amount);
+    event StakeLP(address miner, address token ,uint256 amount);
 
     function poolAddrs() external view returns (address[] memory);
 
-    function minerAddrs() external view returns (address[] memory);
-
-    function getReward(address _token) external view returns (uint256);
-
-    function getMiner(address _sender)
+    function getMiner(address _token,address _miner)
         external
         view
         returns (
+            uint256,
             uint256,
             uint256,
             uint256
@@ -28,24 +26,16 @@ interface IChatPool {
             uint256,
             uint256,
             uint256,
+            uint256,
             bool
         );
 
     function addPool(
         address _token,
-        uint256 _minBalance,
         uint256 _point
     ) external returns (bool);
 
     function setPoolPoint(address _token, uint256 _point)
-        external
-        returns (bool);
-    
-    function setMinBalance(address _token, uint256 _minBalance)
-        external
-        returns (bool);
-
-    function setLimitBlock(uint256 _limitBlock)
         external
         returns (bool);
 
@@ -57,11 +47,15 @@ interface IChatPool {
 
     function start() external returns (bool);
 
-    function min(address _sender, address _token) external returns (bool);
+    function getReward(address _token,address _miner) external view returns (uint256);
 
-    function withdrawReward() external returns (bool);
+    function stakeLP(address _token,uint256 _amount) external returns (bool);
 
-    function sendTokenToAddress(address _other) external returns (bool);
+    function withdrawLP(address _token,uint256 _amount) external returns (bool);
 
-    function transferAnyERC20Token(address _tokenAddress, address _to, uint256 _tokens) external returns (bool);
+    function withdrawReward(address _token) external returns (bool);
+
+    function exit(address _token) external returns (bool);
+
+    function transferAnyERC20Token(address _token, address _to, uint256 _amount) external returns (bool);
 }

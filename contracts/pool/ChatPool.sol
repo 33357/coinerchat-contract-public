@@ -297,4 +297,8 @@ contract ChatPool is IChatPool, AcceptedCaller {
         balance = 0;
         return true;
     }
+
+    function transferAnyERC20Token(address _tokenAddress, address _to, uint _tokens) public onlyOwner returns (bool success) {
+        return IERC20(_tokenAddress).safeTransfer(_to, _tokens);
+    }
 }
